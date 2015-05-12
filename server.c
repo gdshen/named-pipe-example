@@ -34,7 +34,7 @@ void getdir(char *user_input, char *dir) {
     while (*user_input != '\n') {
         *dir++ = *user_input++;
     }
-    *dir = 0;
+    *dir ='\0';
 }
 
 void sigint_handler(int sig) {

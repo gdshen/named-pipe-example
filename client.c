@@ -22,11 +22,11 @@ void help() {
     printf("exit 结束这个client\n");
 }
 
-void from_client_to_server(char *words) {
+void from_client_to_server() {
     CREATE_CLIENT_WRITER_NAME(pipe_client_writer_name, getpid())
 
     int pipe_client_writer_fd = open(pipe_client_writer_name, O_WRONLY);
-    write(pipe_client_writer_fd, words, sizeof(words));
+    write(pipe_client_writer_fd, buff, sizeof(buff));
     close(pipe_client_writer_fd);
 }
 
@@ -35,12 +35,13 @@ void from_server_to_client() {
 
     int pipe_client_reader_fd = open(pipe_client_reader_name, O_RDONLY);
     read(pipe_client_reader_fd, buff, sizeof(buff));
-//    printf("%s\n", buff);
+   // printf("%s\n", buff);
     close(pipe_client_reader_fd);
 }
 
 void exit_program() {
-    from_client_to_server("exit");
+    strcpy(buff,"exit");
+    from_client_to_server();
     from_server_to_client();
 
     unlink(pipe_client_writer_name);
@@ -49,7 +50,8 @@ void exit_program() {
 }
 
 void pwd() {
-    from_client_to_server("pwd");
+    strcpy(buff,"pwd");
+    from_client_to_server();
     from_server_to_client();
     printf("%s", buff);
 }
@@ -78,9 +80,12 @@ void user_input_handler(char *user_input) {
         getdir(user_input, dir);
         chdir(dir);
     } else if (!strncmp(user_input, "cd", 2)) {
-        from_client_to_server(user_input);
+        // printf("%s\n",user_input);
+        strcpy(buff,user_input);
+        from_client_to_server();
     } else if (!strcmp(user_input, "dir\n")) {
-        from_client_to_server("dir");
+        strcpy(buff,"dir");
+        from_client_to_server();
         from_server_to_client();
         printf("%s", buff);
     }
